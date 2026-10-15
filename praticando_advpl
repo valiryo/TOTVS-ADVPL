@@ -1,0 +1,79 @@
+14/10/2026
+#Include 'Protheus.ch'
+
+/*/{Protheus.doc} Ex01Prod
+/*/
+User Function Ex01Prod()
+    // Declaração explícita de variáveis Locais (Notação Húngara)
+    Local cCodigo     := "PRD001"
+    Local cNome       := "Teclado Mecânico"
+    Local nPreco      := 250.00
+    Local nQuantidade := 15
+    Local lAtivo      := .T.
+
+    // Impressão formatada no log do servidor (AppServer)
+    ConOut("=== DADOS DO PRODUTO ===")
+    ConOut("Código....: " + cCodigo)
+    ConOut("Nome......: " + cNome)
+    ConOut("Preço.....: R$ " + Transform(nPreco, "@E 999,999.99"))
+    ConOut("Estoque...: " + cValToChar(nQuantidade) + " un.")
+    ConOut("Status....: " + IIf(lAtivo, "Ativo", "Inativo"))
+    ConOut("========================")
+
+Return Nil
+
+#Include 'Protheus.ch'
+
+/*/{Protheus.doc} Ex02Valida
+Exercício 2: Validação de dados de produto com estruturas condicionais.
+/*/
+User Function Ex02Valida()
+    Local cCodigo     := "PRD002"
+    Local cNome       := ""
+    Local nPreco      := -10.00
+    Local nQuantidade := 5
+
+    ConOut("=== VALIDANDO CADASTRO DO PRODUTO: " + cCodigo + " ===")
+
+    // Validação 1: Nome obrigatório usando a função nativa Empty()
+    If Empty(cNome)
+        ConOut("[ERRO] O Nome do Produto é obrigatório.")
+
+    // Validação 2: Regra de negócio - Preço deve ser estritamente maior que zero
+    ElseIf nPreco <= 0
+        ConOut("[ERRO] O preço deve ser maior que zero.")
+
+    // Se passou por todas as validações anteriores
+    Else
+        ConOut("[SUCESSO] Produto " + cCodigo + " cadastrado com sucesso!")
+    EndIf
+
+Return Nil
+
+#Include 'Protheus.ch'
+
+/*/{Protheus.doc} Ex03Array
+Exercício 3: Criação, povoamento e percorrimento de arrays multidimensionais.
+/*/
+User Function Ex03Array()
+    // 1. Todas as variáveis Locais declaradas no TOPO da função
+    Local aEstoque := {}
+    Local nI       := 0
+
+    // 2. Inserção de itens multidimensionais (aAdd)
+    aAdd(aEstoque, {"PRD001", "Notebook",   4500.00, 10})
+    aAdd(aEstoque, {"PRD002", "Monitor 27", 1500.00,  5})
+
+    ConOut("=== LISTAGEM DE PRODUTOS EM MEMÓRIA ===")
+
+    // 3. Laço For/Next do índice 1 até o tamanho do array (Len)
+    For nI := 1 To Len(aEstoque)
+        ConOut( aEstoque[nI][1] + " | " + ;
+                aEstoque[nI][2] + " | R$ " + ;
+                Transform(aEstoque[nI][3], "@E 999,999.99") + " | Qtd: " + ;
+                cValToChar(aEstoque[nI][4]) )
+    Next nI
+
+    ConOut("========================================")
+
+Return Nil
