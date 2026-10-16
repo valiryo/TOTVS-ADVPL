@@ -77,3 +77,96 @@ User Function Ex03Array()
     ConOut("========================================")
 
 Return Nil
+
+#Include 'Protheus.ch'
+
+/*/{Protheus.doc} Ex04BuscaDel
+Exercício 4: Busca por chave com aScan e remoção física com aDel + aSize.
+/*/
+User Function Ex04BuscaDel()
+    Local aEstoque := {}
+    Local nPos     := 0
+    Local cBusca   := "PRD001"
+
+    // Inserção corrigida (4 colunas padronizadas por linha)
+    aAdd(aEstoque, {"PRD001", "Notebook", 4500.00, 10})
+    aAdd(aEstoque, {"PRD002", "Monitor",  1500.00,  5})
+    aAdd(aEstoque, {"PRD003", "Teclado",   250.00, 15})
+
+    // Busca insensível a maiúsculas/minúsculas e sem espaços extras
+    nPos := aScan(aEstoque, {|x| Upper(AllTrim(x[1])) == Upper(AllTrim(cBusca)) })
+
+    If nPos == 0
+        ConOut("[ERRO] Produto " + cBusca + " não localizado.")
+    Else
+        ConOut("[SUCESSO] Produto encontrado na posição: " + cValToChar(nPos))
+        
+        // Remoção padrão ADVPL: aDel limpa/desloca, aSize redimensiona
+        aDel(aEstoque, nPos)
+        aSize(aEstoque, Len(aEstoque) - 1)
+        
+        ConOut("Nova quantidade de produtos no estoque: " + cValToChar(Len(aEstoque)))
+    EndIf
+
+Return Nil
+
+#Include 'Protheus.ch'
+
+/*/{Protheus.doc} Ex05Main
+Exercício 5: Ponto de entrada e teste de modularização com Static Function.
+/*/
+User Function Ex05Main()
+    Local aProdutos := {}
+
+    ConOut("=== TESTE DE INCLUSÃO MODULARIZADA DE PRODUTOS ===")
+
+    // Teste 1: Inclusão com Sucesso
+    IncluirProd(aProdutos, "PRD001", "Notebook Core i7", 4500.00, 10)
+
+    // Teste 2: Tentativa de Inclusão Duplicada (deve falhar)
+    IncluirProd(aProdutos, "PRD001", "Notebook Duplicado", 3000.00, 5)
+
+    // Teste 3: Tentativa com Nome Vazio (deve falhar)
+    IncluirProd(aProdutos, "PRD002", "", 1500.00, 2)
+
+    // Teste 4: Inclusão do Segundo Produto Válido
+    IncluirProd(aProdutos, "PRD002", "Monitor 27 Pol", 1500.00, 5)
+
+    ConOut("Total de produtos cadastrados em memória: " + cValToChar(Len(aProdutos)))
+    ConOut("==================================================")
+
+Return Nil
+
+/*-------------------------------------------------------------------
+  Static Function: IncluirProd
+  Objetivo: Valida os dados e insere o produto no array em memória.
+-------------------------------------------------------------------*/
+Static Function IncluirProd(aArray, cCod, cNome, nPreco, nQtd)
+    // Validação 1: Nome obrigatório
+    If Empty(cNome)
+        ConOut("[ERRO] O Nome do produto é obrigatório.")
+        Return .F.
+
+    // Validação 2: Preço deve ser maior que zero
+    ElseIf nPreco <= 0
+        ConOut("[ERRO] O Preço deve ser maior do que zero.")
+        Return .F.
+
+    // Validação 3: Quantidade não pode ser negativa
+    ElseIf nQtd < 0
+        ConOut("[ERRO] A Quantidade não pode ser negativa.")
+        Return .F.
+
+    // Validação 4: Verificação de Chave Única (Código Duplicado)
+    ElseIf aScan(aArray, {|x| Upper(AllTrim(x[1])) == Upper(AllTrim(cCod))}) > 0
+        ConOut("[ERRO] Código " + cCod + " já cadastrado no sistema.")
+        Return .F.
+
+    // Inclusão no Array (passado por referência)
+    Else
+        aAdd(aArray, {Upper(AllTrim(cCod)), AllTrim(cNome), nPreco, nQtd})
+        ConOut("[SUCESSO] Produto " + cCod + " (" + cNome + ") cadastrado com sucesso!")
+        Return .T.
+    EndIf
+
+Return .F.
