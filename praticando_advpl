@@ -170,3 +170,63 @@ Static Function IncluirProd(aArray, cCod, cNome, nPreco, nQtd)
     EndIf
 
 Return .F.
+
+#Include 'Protheus.ch'
+
+/*-------------------------------------------------------------------
+  Static Function: ConsultarProd
+  Objetivo: Localizar e exibir os dados detalhados de um produto.
+-------------------------------------------------------------------*/
+Static Function ConsultarProd(aArray, cCod)
+    Local nPos := 0
+
+    // Busca a posição do produto no array multidimensional
+    nPos := aScan(aArray, {|x| Upper(AllTrim(x[1])) == Upper(AllTrim(cCod)) })
+
+    If nPos > 0
+        ConOut("--- DETALHES DO PRODUTO: " + cCod + " ---")
+        ConOut("Código...: " + aArray[nPos][1])
+        ConOut("Nome.....: " + aArray[nPos][2])
+        ConOut("Preço....: R$ " + Transform(aArray[nPos][3], "@E 999,999.99"))
+        ConOut("Estoque..: " + cValToChar(aArray[nPos][4]) + " un.")
+        ConOut("Subtotal.: R$ " + Transform(aArray[nPos][3] * aArray[nPos][4], "@E 999,999.99"))
+        ConOut("----------------------------------------")
+        Return .T.
+    Else    
+        ConOut("[AVISO] Produto " + cCod + " não localizado.")
+        Return .F.
+    EndIf
+
+Return .F.
+
+/*-------------------------------------------------------------------
+  Static Function: AtualizarProd
+  Objetivo: Atualizar o cadastro de um produto existente.
+-------------------------------------------------------------------*/
+Static Function AtualizarProd(aArray, cCod, cNovoNome, nNovoPreco, nNovaQtd)
+    Local nPos := 0
+
+    nPos := aScan(aArray, {|x| Upper(AllTrim(x[1])) == Upper(AllTrim(cCod)) })
+
+    If nPos <= 0
+        ConOut("[AVISO] Produto " + cCod + " não encontrado para alteração.")
+        Return .F.
+    ElseIf Empty(cNovoNome)
+        ConOut("[ERRO] O novo nome do produto é obrigatório.")
+        Return .F.
+    ElseIf nNovoPreco <= 0
+        ConOut("[ERRO] O novo preço deve ser maior do que zero.")
+        Return .F.
+    ElseIf nNovaQtd < 0
+        ConOut("[ERRO] A nova quantidade não pode ser negativa.")
+        Return .F.  
+    Else
+        // Atualização direta das propriedades do elemento na matriz
+        aArray[nPos][2] := AllTrim(cNovoNome)
+        aArray[nPos][3] := nNovoPreco 
+        aArray[nPos][4] := nNovaQtd
+        ConOut("[SUCESSO] Produto " + cCod + " atualizado com sucesso!")
+        Return .T.
+    EndIf
+
+Return .F.
